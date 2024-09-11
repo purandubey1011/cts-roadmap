@@ -66,11 +66,7 @@ exports.signin = catchAsyncErrors(async (req, res, next) => {
 
 // signout student 
 exports.signout = catchAsyncErrors(async (req, res, next) => {
-    // res.clearCookie("token")
-    res.cookie('token', '', {
-        httpOnly: true,
-        expires: new Date(0),
-      });
+    res.clearCookie("token");
     res.json({ message: "Successfully signout!" });
 })
 
