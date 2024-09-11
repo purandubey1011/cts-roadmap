@@ -21,7 +21,7 @@ app.use(
 
 // body parser
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
 // session and cookie
 const session = require("express-session");
@@ -32,9 +32,12 @@ app.use(
         saveUninitialized: true,
         secret: process.env.EXPRESS_SESSION_SECRET,
         cookie: {
-            maxAge: 1000 * 60 * 60 * 24,
-            sameSite: "none",
-            secure: true,
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // 'None' for production, 'Lax' for development
+            secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+            httpOnly: true, // Prevents JavaScript access to cookies
+            domain: ['https://crosstheskylimits.online','http://localhost:5173'], // Set your domain here
+            path: '/', // Set the path for the cookie
         },
     })
 );

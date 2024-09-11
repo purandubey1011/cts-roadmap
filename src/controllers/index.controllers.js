@@ -1,5 +1,3 @@
-const { default: axios } = require("axios")
-let https = require('https')
 const { catchAsyncErrors } = require("../middlewares/catchAsyncErrors")
 const User = require("../models/user.schema.js")
 const ErorrHandler = require("../utils/ErrorHandler")
@@ -68,7 +66,11 @@ exports.signin = catchAsyncErrors(async (req, res, next) => {
 
 // signout student 
 exports.signout = catchAsyncErrors(async (req, res, next) => {
-    res.clearCookie("token");
+    // res.clearCookie("token")
+    res.cookie('token', '', {
+        httpOnly: true,
+        expires: new Date(0),
+      });
     res.json({ message: "Successfully signout!" });
 })
 
@@ -89,7 +91,7 @@ exports.edituser = catchAsyncErrors(async (req, res, next) => {
     let user = await User.findById(req.params.id);
 
     // if user not found
-    if (!user) return next(new ErrorHandler("User not found", 404));
+    if (!user) return next(new ErorrHandler("User not found", 404));
 
     // Remove the avatar field from the request body
     const updates = { ...req.body };
