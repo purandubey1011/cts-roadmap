@@ -33,9 +33,8 @@ app.use(
         secret: process.env.EXPRESS_SESSION_SECRET,
         cookie: {
             maxAge: 1000 * 60 * 60 * 24,
-            sameSite: 'None',
+            sameSite: "none",
             secure: true,
-            httpOnly: true,
         },
     })
 );

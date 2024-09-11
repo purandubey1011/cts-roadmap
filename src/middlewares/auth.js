@@ -13,8 +13,7 @@ exports.isAuthenticated = catchAsyncErrors(async (req, res, next) => {
     }
 
     const { id } = jwt.verify(token, process.env.JWT_SECRET);
-        
-    const user = await User.findById(id).select('-password');
+    const user = await User.findById(id);
 
     if (!user) {
         return next(
