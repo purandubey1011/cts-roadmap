@@ -145,7 +145,6 @@ exports.usersendmail = catchAsyncErrors(async (req, res, next) => {
 
     transport.sendMail(mailOptions, (err, info) => {
         if (err) return next(new ErorrHandler(err, 500));
-        console.log(info);
 
         return res.status(200).json({
             message: "mail sent successfully",

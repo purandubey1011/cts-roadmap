@@ -91,7 +91,6 @@ exports.getroadmap = catchAsyncErrors(async (req, res, next) => {
       `;
   });
 
-console.log(prompt);
   let roadmap = await getChatCompletion(prompt);
 
   // ***************
