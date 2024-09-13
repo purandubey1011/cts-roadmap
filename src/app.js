@@ -32,9 +32,10 @@ app.use(
         saveUninitialized: true,
         secret: process.env.EXPRESS_SESSION_SECRET,
         cookie: {
-            maxAge: 1000 * 60 * 60 * 24,
-            sameSite: "none",
-            secure: true,
+            maxAge: 1000 * 60 * 60 * 24, // 1 day
+            sameSite: "None", // Allow cross-site requests
+            secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+            httpOnly: true, // Prevents JavaScript access to cookies
         },
     })
 );
