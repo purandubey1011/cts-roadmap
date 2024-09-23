@@ -96,7 +96,7 @@ exports.getroadmap = catchAsyncErrors(async (req, res, next) => {
   // ***************
 
   // Create TXT of the roadmap
-  let { txtpath, txtname } = await txtCreater(`${formdata.fullname}-${Date.now()}, ${roadmap}, ${formdata.fullname}`, prompt);
+  let { txtpath, txtname } = await txtCreater(`${formdata.fullname}-${Date.now()}`, roadmap, formdata.fullname, prompt);
 
   // ***************
 
