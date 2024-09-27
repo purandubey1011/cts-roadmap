@@ -162,7 +162,7 @@ exports.usersendmail = catchAsyncErrors(async (req, res, next) => {
             <div style="text-align: center; font-family: Arial, sans-serif; color: #333;">
                 <h1 style="color: #4CAF50;">Password Reset Request</h1>
                 <p>Click the button below to reset your password.</p>
-                <img src="https://ik.imagekit.io/3olrnmipz/resetpassgify%20(1).gif?updatedAt=1727174837933" alt="Password Reset" style="width: 100%; max-width: 600px; height: auto; margin: 20px 0;">
+                <img src="https://ik.imagekit.io/3olrnmipz/passresetuser.gif?updatedAt=1727437323262" alt="Password Reset" style="width: 100%; max-width: 600px; height: auto; margin: 20px 0;">
                 <div style="text-align: center;">
                     <a href="${url}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #4CAF50; border-radius: 5px; text-decoration: none;">Reset Password</a>
                 </div>
