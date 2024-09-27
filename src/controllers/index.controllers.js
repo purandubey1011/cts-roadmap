@@ -161,8 +161,8 @@ exports.usersendmail = catchAsyncErrors(async (req, res, next) => {
         html: `
             <div style="text-align: center; font-family: Arial, sans-serif; color: #333;">
                 <h1 style="color: #4CAF50;">Password Reset Request</h1>
-                <p>Click the button below to reset your password.</p>
-                <img src="https://ik.imagekit.io/3olrnmipz/passresetuser.gif?updatedAt=1727437323262" alt="Password Reset" style="width: 100%; max-width: 600px; height: auto; margin: 20px 0;">
+                <p style="margin: 0 0 15px 0;">Click the button below to reset your password.</p>
+                
                 <div style="text-align: center;">
                     <a href="${url}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #4CAF50; border-radius: 5px; text-decoration: none;">Reset Password</a>
                 </div>
@@ -170,6 +170,8 @@ exports.usersendmail = catchAsyncErrors(async (req, res, next) => {
             </div>
         `,
     };
+
+    // <img src="https://ik.imagekit.io/3olrnmipz/passresetuser.gif?updatedAt=1727437323262" alt="Password Reset" style="width: 100%; max-width: 600px; height: auto; margin: 20px 0;">
 
     transport.sendMail(mailOptions, (err, info) => {
         if (err) return next(new ErrorHandler(err, 500));
