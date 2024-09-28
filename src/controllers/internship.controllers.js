@@ -49,20 +49,3 @@ exports.applyinternship = catchAsyncErrors(async (req, res, next) => {
    }
 });
 
-// Apply for internship
-exports.allinternship = catchAsyncErrors(async (req, res, next) => {
-   try {
-
-    let internship = await Internship.find();
-
-    res.status(200).json({
-        success: true,
-        internshiplength: internship.length,
-        internship
-    });
-
-   } catch (error) {
-    res.status(500).json({ message: error.message
-    });
-   }
-});

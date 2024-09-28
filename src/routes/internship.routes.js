@@ -8,8 +8,4 @@ let router = express.Router();
 // home route
 router.route("/apply").post(applyinternship);
 
-// home route
-router.route("/allinternship").post(allinternship);
-
-
 module.exports = router;
