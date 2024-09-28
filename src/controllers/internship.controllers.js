@@ -18,7 +18,7 @@ exports.applyinternship = catchAsyncErrors(async (req, res, next) => {
     });
 
     if (existedUser) {
-        return next(new ErrorHandler("User with this email or contact already apply for internship", 409));
+        return next(new ErrorHandler("User with this email or contact already applied for internship", 409));
     }
 
     // Create new internship application
