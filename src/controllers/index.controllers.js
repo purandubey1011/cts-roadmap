@@ -91,7 +91,7 @@ exports.edituser = catchAsyncErrors(async (req, res, next) => {
 // Add education to user
 exports.addEducation = catchAsyncErrors(async (req, res, next) => {
     const userId = req.params.id;
-    const newEducation = req.body.education;
+    const newEducation = req.body;
 
     const user = await User.findById(userId);
     if (!user) return next(new ErrorHandler("User not found", 404));
