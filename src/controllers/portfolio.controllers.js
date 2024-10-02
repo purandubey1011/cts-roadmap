@@ -1,7 +1,7 @@
-const { catchAsyncErrors } = require("../middlewares/catchAsyncErrors");
+const { catchAsyncErrors } = require("../middlewares/catchAsyncErrors.js");
 const Portfolio = require("../models/portfolio.schema.js");
-const ErrorHandler = require("../utils/ErrorHandler");
-const imagekit = require('../utils/imagekit').initImageKit();
+const ErrorHandler = require("../utils/ErrorHandler.js");
+const imagekit = require('../utils/imagekit.js').initImageKit();
 let path = require('path');
 
 // create portfolio

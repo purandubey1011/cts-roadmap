@@ -3,7 +3,7 @@ const {  getallusers, pendingroadmap, upload_update_roadmap,updatedroadmap} = re
 const { allinternship } = require("../controllers/admin.controllers.js");
 const { isAuthenticated } = require("../middlewares/auth");
 const { isAdmin } = require("../middlewares/isAdmin.js");
-const { createportfolio, deleteportfolio,updateportfolio } = require("../controllers/portfolio.controllsers.js");
+const { createportfolio, deleteportfolio,updateportfolio } = require("../controllers/portfolio.controllers.js");
 let router = express.Router();
 
 //************* admin routes ***********
