@@ -16,9 +16,11 @@ const PortfolioSchema = new mongoose.Schema({
         required: true
     },
     purchased: {
-        type: [],
-        default: []
+        type: Number,
+        required: true,
+        default: 0
     },
+    
     description: {
         type: String,
         required: true,
