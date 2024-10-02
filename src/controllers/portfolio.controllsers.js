@@ -7,9 +7,9 @@ let path = require('path');
 // create portfolio
 exports.createportfolio = catchAsyncErrors(async (req, res, next) => {
     try {
-        const { name, livelink, price, description } = req.body;
+        const { name, livelink, price, description,purchased } = req.body;
 
-        if (!name || !livelink || !price || !description) {
+        if (!name || !livelink || !price || !description || !purchased) {
             return next(new ErrorHandler("Please enter all fields", 400));
         }
 
@@ -42,7 +42,8 @@ exports.createportfolio = catchAsyncErrors(async (req, res, next) => {
             livelink,
             price,
             description,
-            video: videoDetails
+            video: videoDetails,
+            purchased
         });
 
         res.status(200).json({
@@ -92,6 +93,7 @@ exports.updateportfolio = catchAsyncErrors(async (req, res, next) => {
         if (req.body.livelink) updateFields.livelink = req.body.livelink;
         if (req.body.price) updateFields.price = req.body.price;
         if (req.body.description) updateFields.description = req.body.description;
+        if (req.body.purchased) updateFields.purchased = req.body.purchased;
 
         // Check if updateFields is empty
         if (Object.keys(updateFields).length === 0 && !req.files?.video) {
