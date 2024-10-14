@@ -10,18 +10,19 @@ require('./models/database.js').connectDatabase()
 // logger
 app.use(require('morgan')('tiny'));
 
+
+// body parser
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
 // cors integration
 const cors = require("cors");
-
 app.use(
     cors({
         origin: ["https://crosstheskylimits.online","http://localhost:5173"],
         credentials: true,
     })
   );
-// body parser
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
 // session and cookie
 const session = require("express-session");
