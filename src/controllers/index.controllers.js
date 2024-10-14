@@ -24,7 +24,7 @@ exports.signup = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler("User details required", 401));
     }
 
-    const existedUser = await User.findOne(email).exec();
+    const existedUser = await User.findOne({email}).exec();
 
     if (existedUser) {
         return next(new ErrorHandler("User with this email or contact already exists", 409));
