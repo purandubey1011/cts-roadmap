@@ -18,15 +18,13 @@ exports.homepage = catchAsyncErrors(async (req, res, next) => {
 
 // signup student 
 exports.signup = catchAsyncErrors(async (req, res, next) => {
-    const { name, email, contact, password, avatar, date } = req.body;
+    const { name, email, password, avatar, date } = req.body;
 
-    if ([name, email, contact, password].some((field) => field?.trim() === "")) {
+    if ([name, email, password].some((field) => field?.trim() === "")) {
         return next(new ErrorHandler("User details required", 401));
     }
 
-    const existedUser = await User.findOne({
-        $or: [{ contact }, { email }]
-    });
+    const existedUser = await User.findOne(email).exec();
 
     if (existedUser) {
         return next(new ErrorHandler("User with this email or contact already exists", 409));
@@ -35,7 +33,6 @@ exports.signup = catchAsyncErrors(async (req, res, next) => {
     const user = await User.create({
         name,
         email,
-        contact,
         date,
         avatar: avatar,
         password,
