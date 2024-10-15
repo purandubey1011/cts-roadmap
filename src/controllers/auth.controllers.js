@@ -59,7 +59,7 @@ exports.google = catchAsyncErrors(async (req, res, next) => {
             process.env.JWT_SECRET,
             { expiresIn: "24h" }
           );
-      
+          res.cookie("token", token, { httpOnly: true }); // Optional: Use 
           res.status(200).json({ message: "Login successful.", id: user._id, token });
     } catch (error) {
         console.error("Error sending token:", error.message);
