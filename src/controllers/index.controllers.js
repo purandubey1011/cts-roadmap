@@ -81,11 +81,19 @@ exports.signout = catchAsyncErrors(async (req, res, next) => {
 
 // current student
 exports.currentuser = catchAsyncErrors(async (req, res, next) => {
-    let user = await User.findById(req.id).populate('roadmaps').exec();
+    try {
+        console.log('id mili :',req.id," crnt user chla");
+        let user = await User.findById(req.id).populate('roadmaps').exec();
 
-    if (!user) return next(new ErrorHandler("User not found", 404));
+        if (!user) return next(new ErrorHandler("User not found", 404));
 
-    res.json({ success: true, user: user });
+        res.json({ success: true, user: user });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            error:error.message
+        });
+    }
 });
 
 // update student
