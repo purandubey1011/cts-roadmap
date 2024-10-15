@@ -3,6 +3,7 @@ const { oauth2Client } = require("../utils/googleConfig");
 const userSchema = require("../models/user.schema");
 const { sendtoken } = require("../utils/sendtoken");
 const { catchAsyncErrors } = require("../middlewares/catchAsyncErrors");
+let jwt = require('jsonwebtoken');
 
 //testing page
 exports.google = catchAsyncErrors(async (req, res, next) => {
