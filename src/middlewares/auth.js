@@ -21,8 +21,10 @@ exports.isAuthenticated = catchAsyncErrors(async (req, res, next) => {
     const user = await User.findById(decoded.id);
     req.id = decoded.id;
     req.user = user;
+    console.log('bs next chala ab');
     next();
   } catch (error) {
+    console.log('error aya is auth:',error.message);
     return res
       .status(400)
       .json({ message: "Invalid token.", error: error.message });

@@ -49,7 +49,7 @@ exports.signup = catchAsyncErrors(async (req, res, next) => {
     
       res.cookie("token", token, { httpOnly: true }); // Optional: Use secure: true in production
       res
-        .status(statuscode)
+        .status(200)
         .json({ success: true, id: user._id, token });
 });
 
@@ -84,6 +84,7 @@ exports.currentuser = catchAsyncErrors(async (req, res, next) => {
     try {
         console.log('id mili :',req.id," crnt user chla");
         let user = await User.findById(req.id).populate('roadmaps').exec();
+        console.log("user bhi mila",user.email);
 
         if (!user) return next(new ErrorHandler("User not found", 404));
 
