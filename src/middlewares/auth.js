@@ -4,24 +4,23 @@ const { catchAsyncErrors } = require("./catchAsyncErrors");
 const User = require("../models/user.schema");
 
 exports.isAuthenticated = catchAsyncErrors(async (req, res, next) => {
-    const { token } = req.cookies;
+  const token = req.cookies.token;
 
-    if (!token) {
-        return next(
-            new ErrorHandler("Please login in to access the resource", 401)
-        );
-    }
+  if (!token) {
+    return res
+      .status(401)
+      .json({ message: "Access denied. No token provided. please login" });
+  }
 
-    const { id } = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(id);
-
-    if (!user) {
-        return next(
-            new ErrorHandler("User not found", 404)
-        );
-    }
-
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    req.id = decoded.id;
     req.user = user;
-    req.id = id;
     next();
-}); 
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ message: "Invalid token.", error: error.message });
+  }
+});
