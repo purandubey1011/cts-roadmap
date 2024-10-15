@@ -4,6 +4,9 @@ const { catchAsyncErrors } = require("./catchAsyncErrors");
 const User = require("../models/user.schema");
 
 exports.isAuthenticated = catchAsyncErrors(async (req, res, next) => {
+
+    console.log('is auth chala :', req.cookies);
+
   const token = req.cookies.token;
 
   if (!token) {
@@ -14,7 +17,7 @@ exports.isAuthenticated = catchAsyncErrors(async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded,decoded.id);
+    console.log('decode id :',decoded,decoded.id);
     const user = await User.findById(decoded.id);
     req.id = decoded.id;
     req.user = user;
