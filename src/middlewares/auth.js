@@ -19,6 +19,7 @@ exports.isAuthenticated = catchAsyncErrors(async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log('decode id :',decoded,decoded.id);
     const user = await User.findById(decoded.id);
+    console.log('decoded user wala user:',user);
     req.id = decoded.id;
     req.user = user;
     console.log('bs next chala ab');

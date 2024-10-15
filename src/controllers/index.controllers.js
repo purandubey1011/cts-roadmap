@@ -83,7 +83,7 @@ exports.signout = catchAsyncErrors(async (req, res, next) => {
 exports.currentuser = catchAsyncErrors(async (req, res, next) => {
     try {
         console.log('id mili :',req.id," crnt user chla");
-        let user = await User.findById(req.id).populate('roadmaps').exec();
+        let user = await User.findById(req.id).populate('roadmaps')
         console.log("user bhi mila",user.email);
 
         if (!user) return next(new ErrorHandler("User not found", 404));
