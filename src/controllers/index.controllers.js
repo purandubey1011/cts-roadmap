@@ -5,6 +5,7 @@ const ErrorHandler = require("../utils/ErrorHandler"); // Fixed typo
 const { sendtoken } = require("../utils/sendtoken");
 const nodemailer = require("nodemailer");
 let path = require('path');
+let jwt = require('jsonwebtoken');
 
 let imagekit = require('../utils/imagekit.js').initImageKit();
 
@@ -38,7 +39,18 @@ exports.signup = catchAsyncErrors(async (req, res, next) => {
         password,
     });
 
-    sendtoken(user, 200, res);
+    const token = jwt.sign(
+        { id: user._id, email: user.email },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+    
+      // await getiplocation(user);
+    
+      res.cookie("token", token, { httpOnly: true }); // Optional: Use secure: true in production
+      res
+        .status(statuscode)
+        .json({ success: true, id: user._id, token });
 });
 
 // signin student 
@@ -50,7 +62,15 @@ exports.signin = catchAsyncErrors(async (req, res, next) => {
     const isMatch = await user.comparepassword(req.body.password);
     if (!isMatch) return next(new ErrorHandler("Incorrect password", 400));
 
-    sendtoken(user, 200, res);
+    // sendtoken(user, 200, res);
+    // Generate JWT token
+    const token = jwt.sign(
+        { id: user._id, email: user.email },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+  
+      res.status(200).json({ message: "Login successful.", id: user._id, token });
 });
 
 // signout student 
