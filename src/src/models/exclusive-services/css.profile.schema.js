@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 
-const commonapp = new mongoose.Schema(
+const cssprofile = new mongoose.Schema(
   {
-    commonappid: {
+    cssprofileid: {
       type: String,
       trim: true,
       default: "",
@@ -58,7 +58,7 @@ const razorpay = new Razorpay({
 });
 
 // Method to verify payment
-commonapp.statics.verifyPayment = function (paymentDetails) {
+cssprofile.statics.verifyPayment = function (paymentDetails) {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
       paymentDetails;
@@ -72,6 +72,6 @@ commonapp.statics.verifyPayment = function (paymentDetails) {
   }
 };
 
-const common_app = mongoose.model("commonapp payment  ", commonapp);
+const css_profile = mongoose.model("cssprofile", cssprofile);
 
-module.exports = common_app;
+module.exports = css_profile;

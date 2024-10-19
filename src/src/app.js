@@ -26,7 +26,6 @@ app.use(express.urlencoded({ extended: false }));
 // session and cookie
 const session = require("express-session");
 const cookieparser = require("cookie-parser");
-
 app.use(
     session({
         resave: true,
@@ -40,7 +39,6 @@ app.use(
         },
     })
 );
-
 app.use(cookieparser());
 // express file-upload
 const fileupload = require("express-fileupload");
