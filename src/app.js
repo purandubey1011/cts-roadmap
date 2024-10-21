@@ -10,13 +10,24 @@ require('./models/database.js').connectDatabase()
 // logger
 app.use(require('morgan')('tiny'));
 
+// Global CORS Headers Middleware
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'https://crosstheskylimits.online'); // Frontend URL
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE'); // Allowed Methods
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allowed Headers
+    res.setHeader('Access-Control-Allow-Credentials', 'true'); // Allow credentials like cookies
+    next();
+});
+
 // cors integration
 const cors = require("cors");
 
 app.use(
     cors({
-        origin: ["https://crosstheskylimits.online","http://localhost:5173"],
-        credentials: true,
+        origin: ["https://crosstheskylimits.online", "http://localhost:5173"],
+        credentials: true, 
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization']
     })
   );
 // body parser
