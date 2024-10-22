@@ -2,18 +2,24 @@ const mongoose = require('mongoose');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 
-const essayediting = new mongoose.Schema({
-    essaytype: {
+const exampayment = new mongoose.Schema({
+    name: {
         type: String,
-        required: true,
-        trim: true,
+        required: true
     },
-    essayfile: {
+    email: {
         type: String,
-        required: true,
-        trim: true,
+        required: true
     },
-    instructions: {
+    contact: {
+        type: String,
+        required: true
+    },
+    score:{
+        type: Number,
+        default: 0
+    },
+   exam_type: {
         type: String,
     },
     userid: {
@@ -46,7 +52,6 @@ const essayediting = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-    
 }, { timestamps: true });
 
 // Razorpay instance
@@ -56,7 +61,7 @@ const razorpay = new Razorpay({
 });
 
 // Method to verify payment
-essayediting.statics.verifyPayment = function(paymentDetails) {
+exampayment.statics.verifyPayment = function(paymentDetails) {
     try {
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = paymentDetails;
         const hmac = crypto.createHmac('sha256', razorpay.key_secret);
@@ -69,6 +74,6 @@ essayediting.statics.verifyPayment = function(paymentDetails) {
     }
 };
 
-const essay = mongoose.model('essay_payment', essayediting);
+const exam_prep = mongoose.model('exam_prep_payment', exampayment);
 
-module.exports = essay;
+module.exports = exam_prep;

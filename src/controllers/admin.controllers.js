@@ -5,6 +5,8 @@ let {initImageKit} = require('../utils/imagekit.js')
 const { sendmailuser } = require('../utils/sendmailuser.js');
 const UpdatedRoadmap = require("../models/updated.roadmap.schema.js");
 const Internship = require("../models/internshipApplication.schema.js");
+let Exam = require("../models/exclusive-services/exam-preperation/examtiming.schema.js");
+const ErrorHandler = require("../utils/ErrorHandler.js");
 // user related things
 
 exports.getallusers = catchAsyncErrors(async (req, res, next) => {
@@ -113,3 +115,88 @@ exports.allinternship = catchAsyncErrors(async (req, res, next) => {
      });
     }
  });
+
+ 
+// **********************
+
+// exam preperation in exclusive services
+
+// Create exam
+exports.create_exam = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const { examname, from, to } = req.body;
+
+        // Check if any required field is missing or empty
+        if ([examname, from, to].some((field) => typeof field === 'string' && field.trim() === "")) {
+            return next(new ErrorHandler("All fields are required", 401));
+        }
+
+        // Create the exam
+        let exam = await Exam.create({ examname,from, to });
+        await exam.save();
+        
+        // Send response
+        res.status(201).json({
+            success: true,
+            message: "Exam created successfully",
+            exam
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Delete exam
+exports.delete_exam = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const { id } = req.params;
+
+        // Find the exam by ID and delete it
+        const exam = await Exam.findByIdAndDelete(id);
+
+        if (!exam) {
+            return next(new ErrorHandler("Exam not found", 404));
+        }
+
+        // Send response
+        res.status(200).json({
+            success: true,
+            message: "Exam deleted successfully"
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Update exam
+exports.update_exam = catchAsyncErrors(async (req, res, next) => {
+    try {
+        let { id } = req.params;
+        let {examname, from, to } = req.body;
+
+        if ([examname, from, to].some((field) => typeof field === 'string' && field.trim() === "")) {
+            return next(new ErrorHandler("All fields are required", 401));
+        }
+
+        // Find the exam by ID and update it
+        const exam = await Exam.findByIdAndUpdate(
+            id,
+            {  examname,from, to },
+            { new: true, runValidators: true }
+        );
+
+        if (!exam) {
+            return next(new ErrorHandler("Exam not found", 404));
+        }
+
+        await exam.save()
+        // Send response
+        res.status(200).json({
+            success: true,
+            message: "Exam updated successfully",
+            exam
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});

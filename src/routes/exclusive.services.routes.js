@@ -8,7 +8,8 @@ const {
   payment_success_commonapp,
   CssProfile,
   cssprofile_verifypayment,
-  payment_success_cssprofile
+  payment_success_cssprofile,
+  examprep_createpayment
 } = require("../controllers/exclusive.controllers");
 const { isAuthenticated } = require("../middlewares/auth");
 
@@ -46,5 +47,16 @@ router.route("/cssprofile-verify-payment").post(cssprofile_verifypayment);
 
 // route for verify payment
 router.route("/payment-success-cssprofile/:payid").post(payment_success_cssprofile);
+
+// **************exam preperation routes for payment, rest route in admin***************
+
+// essay submission and order creation
+router.route("/examprep-create-payment").post(examprep_createpayment);
+
+// // route for verify payment
+// router.route("/cssprofile-verify-payment").post(cssprofile_verifypayment);
+
+// // route for verify payment
+// router.route("/payment-success-cssprofile/:payid").post(payment_success_cssprofile);
 
 module.exports = router;

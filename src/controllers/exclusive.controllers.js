@@ -6,6 +6,7 @@ const ErrorHandler = require("../utils/ErrorHandler.js");
 const User = require("../models/user.schema.js");
 const ImageKit = require("../utils/imagekit.js").initImageKit();
 const nodemailer = require("nodemailer");
+const Exampay = require("../models/exclusive-services/exam-preperation/exampayment.schema.js");
 
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
@@ -214,7 +215,7 @@ exports.CommonAppReview = catchAsyncErrors(async (req, res, next) => {
     }
 
     // Save initial payment details without paymentId
-    const common_app = new Commonapp({
+    const exam_prep = new Exam({
       commonappid,
       password,
       meeting,
@@ -223,7 +224,7 @@ exports.CommonAppReview = catchAsyncErrors(async (req, res, next) => {
       status: "created",
       userid,
     });
-    await common_app.save();
+    await exam_prep.save();
 
     res.status(200).json(order);
   } catch (error) {
@@ -260,7 +261,6 @@ exports.commonapp_verifypayment = catchAsyncErrors(async (req, res, next) => {
 
       res.redirect(
         `${process.env.HOST}/services/common-app-review/paymentsuccess/${razorpay_payment_id}`
-
       );
     } else {
       // Update payment status to failed
@@ -289,7 +289,9 @@ exports.commonapp_verifypayment = catchAsyncErrors(async (req, res, next) => {
 exports.payment_success_commonapp = catchAsyncErrors(async (req, res, next) => {
   try {
     const logged_in_user = req.body;
-    const commonapp_payment = await Commonapp.findOne({ paymentId: req.params.payid });
+    const commonapp_payment = await Commonapp.findOne({
+      paymentId: req.params.payid,
+    });
     if (!commonapp_payment) {
       return res.status(404).json({ message: "Payment record not found" });
     }
@@ -333,14 +335,16 @@ exports.payment_success_commonapp = catchAsyncErrors(async (req, res, next) => {
       if (err) return next(new ErrorHandler(err, 500));
       res
         .status(200)
-        .json({ message: "Payment successful", status: commonapp_payment.status });
+        .json({
+          message: "Payment successful",
+          status: commonapp_payment.status,
+        });
     });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
   }
 });
-
 
 // *************CSS PROFILE HELP******************
 
@@ -419,7 +423,6 @@ exports.cssprofile_verifypayment = catchAsyncErrors(async (req, res, next) => {
 
       res.redirect(
         `${process.env.HOST}/services/common-app-review/paymentsuccess/${razorpay_payment_id}`
-
       );
     } else {
       // Update payment status to failed
@@ -445,29 +448,32 @@ exports.cssprofile_verifypayment = catchAsyncErrors(async (req, res, next) => {
 });
 
 //paymentsuccess rout for send mail common app
-exports.payment_success_cssprofile = catchAsyncErrors(async (req, res, next) => {
-  try {
-    const logged_in_user = req.body;
-    const commonapp_payment = await Commonapp.findOne({ paymentId: req.params.payid });
-    if (!commonapp_payment) {
-      return res.status(404).json({ message: "Payment record not found" });
-    }
-    const user = await User.findById(logged_in_user._id).exec();
-    const transport = nodemailer.createTransport({
-      service: "gmail",
-      host: "smtp.gmail.com",
-      post: 465,
-      auth: {
-        user: process.env.MAIL_EMAIL_ADDRESS,
-        pass: process.env.MAIL_PASSWORD,
-      },
-    });
+exports.payment_success_cssprofile = catchAsyncErrors(
+  async (req, res, next) => {
+    try {
+      const logged_in_user = req.body;
+      const commonapp_payment = await Commonapp.findOne({
+        paymentId: req.params.payid,
+      });
+      if (!commonapp_payment) {
+        return res.status(404).json({ message: "Payment record not found" });
+      }
+      const user = await User.findById(logged_in_user._id).exec();
+      const transport = nodemailer.createTransport({
+        service: "gmail",
+        host: "smtp.gmail.com",
+        post: 465,
+        auth: {
+          user: process.env.MAIL_EMAIL_ADDRESS,
+          pass: process.env.MAIL_PASSWORD,
+        },
+      });
 
-    const mailOptions = {
-      from: "Cross The Skylimits.",
-      to: user.email,
-      subject: "Congratulations! Your CSS Profile Support is Confirmed!",
-      html: `
+      const mailOptions = {
+        from: "Cross The Skylimits.",
+        to: user.email,
+        subject: "Congratulations! Your CSS Profile Support is Confirmed!",
+        html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
           <h1 style="font-size: 24px; font-weight: bold; color: #1a202c; margin-bottom: 20px;">Congratulations! Your CSS Profile Support is Confirmed!</h1>
           <p style="font-size: 16px; color: #4a5568; margin-bottom: 20px;">Dear ${user.name},</p>
@@ -499,14 +505,58 @@ exports.payment_success_cssprofile = catchAsyncErrors(async (req, res, next) => 
           </p>
       </div>
       `,
-  };
-    
-    transport.sendMail(mailOptions, (err, info) => {
-      if (err) return next(new ErrorHandler(err, 500));
-      res
-        .status(200)
-        .json({ message: "Payment successful", status: commonapp_payment.status });
+      };
+
+      transport.sendMail(mailOptions, (err, info) => {
+        if (err) return next(new ErrorHandler(err, 500));
+        res
+          .status(200)
+          .json({
+            message: "Payment successful",
+            status: commonapp_payment.status,
+          });
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error.message });
+    }
+  }
+);
+
+exports.examprep_createpayment = catchAsyncErrors(async (req, res, next) => {
+  try {
+    let { userid, amount ,name,email,contact} = req.body;
+
+    let user = await User.findById(userid);
+    if (!user) {
+      return next(new ErrorHandler("User not found", 404));
+    }
+
+    const options = {
+      amount: amount * 100, // amount in the smallest currency unit
+      currency: "INR",
+      receipt: `receipt_${userid}`, // Use a unique identifier for the receipt
+      payment_capture: 1, // Auto capture payment, so that the payment is captured as soon as it is created
+    };
+
+    const order = await razorpay.orders.create(options);
+
+    if (!order) {
+      return next(new ErrorHandler("Error creating Razorpay order", 500));
+    }
+    // Save initial payment details without paymentId
+    const examprep_payment = new Exampay({
+      orderId: order.id,
+      amount,
+      status: "created",
+      userid,
+      name,
+      email,
+      contact
     });
+    await examprep_payment.save();
+
+    res.status(200).json(order);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
