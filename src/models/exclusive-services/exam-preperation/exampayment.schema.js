@@ -17,8 +17,7 @@ const exampayment = new mongoose.Schema({
         required: true
     },
     score:{
-        type: Number,
-        default: 0
+        type: String,
     },
    exam_type: {
         type: String,
