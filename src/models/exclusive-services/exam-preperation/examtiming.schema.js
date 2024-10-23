@@ -22,10 +22,10 @@ const exam_prep_duration = new mongoose.Schema(
       trim: true,
     },
     total_enrolled:[
-            {
-                type:mongoose.Schema.Types.ObjectId,
-                ref:"User",
-            }
+    {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User",
+    }
     ],
     createdAt: {
       type: Date,

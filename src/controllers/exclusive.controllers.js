@@ -526,7 +526,7 @@ exports.payment_success_cssprofile = catchAsyncErrors(
 
 exports.examprep_createpayment = catchAsyncErrors(async (req, res, next) => {
   try {
-    let { userid, amount ,name,email,contact} = req.body;
+    let { userid, amount ,name,email,contact,score,exam_type} = req.body;
 
     let user = await User.findById(userid);
     if (!user) {
@@ -553,7 +553,9 @@ exports.examprep_createpayment = catchAsyncErrors(async (req, res, next) => {
       userid,
       name,
       email,
-      contact
+      contact,
+      score,
+      exam_type
     });
     await examprep_payment.save();
 
@@ -587,6 +589,7 @@ exports.examprep_verifypayment = catchAsyncErrors(async (req, res, next) => {
       exams_prep.paymentId = razorpay_payment_id;
       exams_prep.signature = razorpay_signature;
       exams_prep.status = "paid";
+      exams_prep.expireAt = undefined; // Remove the expiration time
 
       await exams_prep.save();
 
@@ -635,12 +638,17 @@ exports.examprep_success_payment = catchAsyncErrors(
       }
       const user = await User.findById(logged_in_user._id).exec();
 
+      if (!user) {
+        return next(new ErrorHandler("User not found when success payment", 404));
+      }
+
       let exam_name = await ExamName.findOne({ examname: filterExam });
 
       exam_name.total_enrolled.push(user._id);
 
       await exam_name.save();
 
+      //this email sent to student who purchased
       const transport = nodemailer.createTransport({
         service: "gmail",
         host: "smtp.gmail.com",
