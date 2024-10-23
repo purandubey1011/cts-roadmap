@@ -334,12 +334,10 @@ exports.payment_success_commonapp = catchAsyncErrors(async (req, res, next) => {
 
     transport.sendMail(mailOptions, (err, info) => {
       if (err) return next(new ErrorHandler(err, 500));
-      res
-        .status(200)
-        .json({
-          message: "Payment successful",
-          status: commonapp_payment.status,
-        });
+      res.status(200).json({
+        message: "Payment successful",
+        status: commonapp_payment.status,
+      });
     });
   } catch (error) {
     console.log(error);
@@ -510,12 +508,10 @@ exports.payment_success_cssprofile = catchAsyncErrors(
 
       transport.sendMail(mailOptions, (err, info) => {
         if (err) return next(new ErrorHandler(err, 500));
-        res
-          .status(200)
-          .json({
-            message: "Payment successful",
-            status: commonapp_payment.status,
-          });
+        res.status(200).json({
+          message: "Payment successful",
+          status: commonapp_payment.status,
+        });
       });
     } catch (error) {
       console.log(error);
@@ -526,7 +522,7 @@ exports.payment_success_cssprofile = catchAsyncErrors(
 
 exports.examprep_createpayment = catchAsyncErrors(async (req, res, next) => {
   try {
-    let { userid, amount ,name,email,contact,score,exam_type} = req.body;
+    let { userid, amount, name, email, contact, score, exam_type } = req.body;
 
     let user = await User.findById(userid);
     if (!user) {
@@ -555,7 +551,7 @@ exports.examprep_createpayment = catchAsyncErrors(async (req, res, next) => {
       email,
       contact,
       score,
-      exam_type
+      exam_type,
     });
     await examprep_payment.save();
 
@@ -571,19 +567,21 @@ exports.examprep_verifypayment = catchAsyncErrors(async (req, res, next) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
       req.body;
 
-      const paymentDetails = {
-        razorpay_order_id,
-        razorpay_payment_id,
-        razorpay_signature,
-      };
-  
+    const paymentDetails = {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+    };
+
     const isValid = await Exampay.verifyPayment(paymentDetails);
 
     if (isValid) {
       const exams_prep = await Exampay.findOne({ orderId: razorpay_order_id });
 
       if (!exams_prep) {
-        return res.status(404).json({ message: "exams_prep Payment record not found" });
+        return res
+          .status(404)
+          .json({ message: "exams_prep Payment record not found" });
       }
 
       exams_prep.paymentId = razorpay_payment_id;
@@ -619,65 +617,135 @@ exports.examprep_verifypayment = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-
 //paymentsuccess rout for send mail common app
-exports.examprep_success_payment = catchAsyncErrors(
-  async (req, res, next) => {
-    try {
-      const logged_in_user = req.body;
-      const examprep_payment = await Exampay.findOne({
-        paymentId: req.params.payid,
-      });
+exports.examprep_success_payment = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const logged_in_user = req.body;
+    const examprep_payment = await Exampay.findOne({
+      paymentId: req.params.payid,
+    });
 
-      let {name,email,contact,score,exam_type,amount} = examprep_payment;
+    let { name, email, contact, score, exam_type, amount } = examprep_payment;
 
-      let filterExam = examprep_payment.exam_type;
+    let filterExam = examprep_payment.exam_type;
 
-      if (!examprep_payment) {
-        return res.status(404).json({ message: "Payment record not found" });
-      }
-      const user = await User.findById(logged_in_user._id).exec();
-
-      if (!user) {
-        return next(new ErrorHandler("User not found when success payment", 404));
-      }
-
-      let exam_name = await ExamName.findOne({ examname: filterExam });
-
-      exam_name.total_enrolled.push(user._id);
-
-      await exam_name.save();
-
-      //this email sent to student who purchased
-      const transport = nodemailer.createTransport({
-        service: "gmail",
-        host: "smtp.gmail.com",
-        post: 465,
-        auth: {
-          user: process.env.MAIL_EMAIL_ADDRESS,
-          pass: process.env.MAIL_PASSWORD,
-        },
-      });
-
-      const mailOptions = {
-        from: "Cross The Skylimits.",
-        to: user.email,
-        subject: "Congratulations! Your CSS Profile Support is Confirmed!",
-        html: "<h1>pending</h1>",
-      };
-
-      transport.sendMail(mailOptions, (err, info) => {
-        if (err) return next(new ErrorHandler(err, 500));
-        res
-          .status(200)
-          .json({
-            message: "Payment successful",
-            status: examprep_payment.status,
-          });
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: error.message });
+    if (!examprep_payment) {
+      return res.status(404).json({ message: "Payment record not found" });
     }
+    const user = await User.findById(logged_in_user._id).exec();
+
+    if (!user) {
+      return next(new ErrorHandler("User not found when success payment", 404));
+    }
+
+    let exam_name = await ExamName.findOne({ examname: filterExam });
+
+    exam_name.total_enrolled.push(user._id);
+
+    await exam_name.save();
+
+    // ********************************************************************
+    // this mail send to shubhankar
+    const transport1 = nodemailer.createTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true, // Use SSL
+      auth: {
+        user: process.env.MAIL_EMAIL_ADDRESS,
+        pass: process.env.MAIL_PASSWORD,
+      },
+    });
+
+    const mailOptions1 = {
+      from: "Cross The Skylimits.",
+      to: "dubeypuran2002@gmail.com",
+      subject: `COURSE PURCHASED! ${exam_type} CTS ❤`,
+      html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h1 style="font-size: 24px; font-weight: bold; color: #1a202c; margin-bottom: 20px;">New Purchase Notification</h1>
+        <p style="font-size: 16px; color: #4a5568; margin-bottom: 20px;">A user has just made a payment for an exam preparation service. Here are the details:</p>
+        <ul style="font-size: 16px; color: #4a5568; margin-bottom: 20px;">
+          <li><strong>Name:</strong> ${name}</li>
+          <li><strong>Email:</strong> ${email}</li>
+          <li><strong>Contact:</strong> ${contact}</li>
+          <li><strong>Exam name:</strong> ${exam_type}</li>
+          <li><strong>Amount paid for ${exam_type}:</strong> ₹${amount}</li>
+          <li><strong>previous ${exam_type} Score:</strong> ${score}</li>
+        </ul>
+        
+        <p style="font-size: 16px; color: #4a5568; margin-bottom: 20px;">
+          Best regards,<br>
+          The Crosstheskylimits developer team.
+        </p>
+      </div>
+    `,
+    };
+
+    transport1.sendMail(mailOptions1, (err, info) => {
+      if (err) return next(new ErrorHandler(err, 500));
+      // console.log(info);
+
+      return res.status(200).json({
+        message: "mail sent to admin!",
+      });
+    });
+
+    // ********************************************************************
+    //this email sent to student who purchased
+    const transport = nodemailer.createTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      post: 465,
+      secure: true, // Use SSL
+      auth: {
+        user: process.env.MAIL_EMAIL_ADDRESS,
+        pass: process.env.MAIL_PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      from: "Cross The Skylimits.",
+      to: user.email,
+      subject: `Welcome to the ${exam_type} Course – Your Journey to Success Begins!
+`,
+html: `
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+    <h1 style="font-size: 24px; font-weight: bold; color: #1a202c; margin-bottom: 20px;">Welcome to the ${exam_type} Course – Your Journey to Success Begins!</h1>
+    <p style="font-size: 16px; color: #4a5568; margin-bottom: 20px;">Dear ${user.name},</p>
+    <p style="font-size: 16px; color: #4a5568; margin-bottom: 20px;">
+        Congratulations on enrolling in our ${exam_type} course! We’re thrilled to have you on board as you take the next step toward achieving your dream score. Rest assured, our team is here to guide and support you every step of the way.
+    </p>
+    <p style="font-size: 16px; color: #4a5568; margin-bottom: 20px;">
+        Our instructor, Subhankar Parashar, will be in touch shortly to send you the class structure and officially add you to the course. We’re confident that with dedication and the right guidance, you’ll be well-prepared to excel.
+    </p>
+    <p style="font-size: 16px; color: #4a5568; margin-bottom: 20px;">
+        Once again, thank you for choosing us to be part of your journey! If you have any questions or need further assistance, please don’t hesitate to contact us. Here are our contact details:
+    </p>
+    <ul style="font-size: 16px; color: #4a5568; margin-bottom: 20px;">
+        <li>Email: <a href="mailto:crosstheskylimits@gmail.com">crosstheskylimits@gmail.com</a></li>
+        <li>Phone: +91 7049491861</li>
+    </ul>
+    <p style="font-size: 16px; color: #4a5568; margin-bottom: 20px;">
+        We look forward to working with you!
+    </p>
+    <p style="font-size: 16px; color: #4a5568; margin-bottom: 20px;">
+        Best regards,<br>
+        The ${exam_type} Course Team
+    </p>
+</div>
+`,
+    };
+
+    transport.sendMail(mailOptions, (err, info) => {
+      if (err) return next(new ErrorHandler(err, 500));
+      res.status(200).json({
+        message: "Payment successful",
+        status: examprep_payment.status,
+      });
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
   }
-);
+});
