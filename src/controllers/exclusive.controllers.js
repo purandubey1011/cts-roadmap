@@ -100,6 +100,7 @@ exports.essayverifypayment = catchAsyncErrors(async (req, res, next) => {
       payment.paymentId = razorpay_payment_id;
       payment.signature = razorpay_signature;
       payment.status = "paid";
+      payment.expireAt = undefined;
 
       await payment.save();
       res.redirect(
@@ -257,6 +258,7 @@ exports.commonapp_verifypayment = catchAsyncErrors(async (req, res, next) => {
       payment.paymentId = razorpay_payment_id;
       payment.signature = razorpay_signature;
       payment.status = "paid";
+      payment.expireAt = undefined; // Remove the expiration time
 
       await payment.save();
 
@@ -417,6 +419,7 @@ exports.cssprofile_verifypayment = catchAsyncErrors(async (req, res, next) => {
       payment.paymentId = razorpay_payment_id;
       payment.signature = razorpay_signature;
       payment.status = "paid";
+      payment.expireAt = undefined;
 
       await payment.save();
 
