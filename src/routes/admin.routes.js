@@ -71,4 +71,21 @@ router
   .route("/delete-exam/:id")
   .post(isAuthenticated, isAdmin, delete_exam);
 
+  
+//*************all payment combine ***********
+// route for porfolio all payment
+router.route("/allportfolio_pay").post(isAuthenticated, isAdmin, getallportfolio_payment);
+
+// route for essay all payment
+router.route("/allessay_pay").post(isAuthenticated, isAdmin, getallessay_payment);
+
+// route for common app all payment
+router.route("/allcommonapp_pay").post(isAuthenticated, isAdmin, getallcommonapp_payment);
+
+// route for common app all payment
+router.route("/allcssprofile_pay").post(isAuthenticated, isAdmin, getallcssprofile_payment);
+
+// route for common app all payment
+router.route("/allexamprep_pay").post(isAuthenticated, isAdmin, getallexamprep_payment);
+
 module.exports = router;
