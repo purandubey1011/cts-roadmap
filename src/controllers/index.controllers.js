@@ -273,7 +273,7 @@ exports.showportfolio = catchAsyncErrors(async (req, res, next) => {
 // get all exams
 exports.allexams = catchAsyncErrors(async (req, res, next) => {
   try {
-    const exams = await Exams.find();
+    const exams = await Exams.find().populate('total_enrolled').exec();
     if (!exams) return next(new ErrorHandler("exams not found", 404));
     res.status(200).json({
       success: true,
