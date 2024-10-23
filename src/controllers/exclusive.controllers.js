@@ -7,6 +7,7 @@ const User = require("../models/user.schema.js");
 const ImageKit = require("../utils/imagekit.js").initImageKit();
 const nodemailer = require("nodemailer");
 const Exampay = require("../models/exclusive-services/exam-preperation/exampayment.schema.js");
+const ExamName = require("../models/exclusive-services/exam-preperation/examtiming.schema.js");
 
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
@@ -562,3 +563,113 @@ exports.examprep_createpayment = catchAsyncErrors(async (req, res, next) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+exports.examprep_verifypayment = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+      req.body;
+
+      const paymentDetails = {
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+      };
+  
+    const isValid = await Exampay.verifyPayment(paymentDetails);
+
+    if (isValid) {
+      const exams_prep = await Exampay.findOne({ orderId: razorpay_order_id });
+
+      if (!exams_prep) {
+        return res.status(404).json({ message: "exams_prep Payment record not found" });
+      }
+
+      exams_prep.paymentId = razorpay_payment_id;
+      exams_prep.signature = razorpay_signature;
+      exams_prep.status = "paid";
+
+      await exams_prep.save();
+
+      res.redirect(
+        `${process.env.HOST}/services/exam-prep/paymentsuccess/${razorpay_payment_id}`
+      );
+    } else {
+      // Update payment status to failed
+      const exams_prep = await Exampay.findOne({ orderId: razorpay_order_id });
+
+      if (!exams_prep) {
+        return res.status(404).json({ message: "Payment record not found" });
+      }
+
+      exams_prep.status = "failed";
+      await exams_prep.save();
+
+      res.status(400).json({
+        message: "Invalid payment signature",
+        status: exams_prep.status,
+      });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error verifying payment: " + error.message });
+  }
+});
+
+
+//paymentsuccess rout for send mail common app
+exports.examprep_success_payment = catchAsyncErrors(
+  async (req, res, next) => {
+    try {
+      const logged_in_user = req.body;
+      const examprep_payment = await Exampay.findOne({
+        paymentId: req.params.payid,
+      });
+
+      let {name,email,contact,score,exam_type,amount} = examprep_payment;
+
+      let filterExam = examprep_payment.exam_type;
+
+      if (!examprep_payment) {
+        return res.status(404).json({ message: "Payment record not found" });
+      }
+      const user = await User.findById(logged_in_user._id).exec();
+
+      let exam_name = await ExamName.findOne({ examname: filterExam });
+
+      exam_name.total_enrolled.push(user._id);
+
+      await exam_name.save();
+
+      const transport = nodemailer.createTransport({
+        service: "gmail",
+        host: "smtp.gmail.com",
+        post: 465,
+        auth: {
+          user: process.env.MAIL_EMAIL_ADDRESS,
+          pass: process.env.MAIL_PASSWORD,
+        },
+      });
+
+      const mailOptions = {
+        from: "Cross The Skylimits.",
+        to: user.email,
+        subject: "Congratulations! Your CSS Profile Support is Confirmed!",
+        html: "<h1>pending</h1>",
+      };
+
+      transport.sendMail(mailOptions, (err, info) => {
+        if (err) return next(new ErrorHandler(err, 500));
+        res
+          .status(200)
+          .json({
+            message: "Payment successful",
+            status: examprep_payment.status,
+          });
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error.message });
+    }
+  }
+);

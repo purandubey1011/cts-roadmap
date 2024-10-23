@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+const ExamTiming = require('./examtiming.schema');
 
 const exampayment = new mongoose.Schema({
     name: {
@@ -61,7 +62,7 @@ const razorpay = new Razorpay({
 });
 
 // Method to verify payment
-exampayment.statics.verifyPayment = function(paymentDetails) {
+exampayment.statics.verifyPayment =async function(paymentDetails) {
     try {
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = paymentDetails;
         const hmac = crypto.createHmac('sha256', razorpay.key_secret);

@@ -7,6 +7,10 @@ const exam_prep_duration = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    amount: {
+      type: String,
+      default: 0,
+    },
     from: {
       type: String,
       default: "",
