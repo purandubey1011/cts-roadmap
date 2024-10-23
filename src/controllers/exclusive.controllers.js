@@ -706,7 +706,7 @@ exports.examprep_success_payment = catchAsyncErrors(async (req, res, next) => {
 
     const mailOptions = {
       from: "Cross The Skylimits.",
-      to: user.email,
+      to: email,
       subject: `Welcome to the ${exam_type} Course – Your Journey to Success Begins!
 `,
 html: `
