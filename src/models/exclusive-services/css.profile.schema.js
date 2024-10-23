@@ -58,7 +58,7 @@ const cssprofile = new mongoose.Schema(
 );
 
 // Create TTL index on expireAt field
-commonapp.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
+cssprofile.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
 
 // Razorpay instance
 const razorpay = new Razorpay({

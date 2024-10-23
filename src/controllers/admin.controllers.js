@@ -7,6 +7,15 @@ const UpdatedRoadmap = require("../models/updated.roadmap.schema.js");
 const Internship = require("../models/internshipApplication.schema.js");
 let Exam = require("../models/exclusive-services/exam-preperation/examtiming.schema.js");
 const ErrorHandler = require("../utils/ErrorHandler.js");
+
+// payment schema
+const PortfolioPayment = require("../models/payment.schema.js");
+const CommanappPayment = require("../models/exclusive-services/common.app.schema.js");
+const Essaypayment = require("../models/exclusive-services/eassy.editing.schema.js");
+const CssProfilePayment = require("../models/exclusive-services/css.profile.schema.js");
+const Examprep_payment = require("../models/exclusive-services/exam-preperation/exampayment.schema.js");
+
+
 // user related things
 
 exports.getallusers = catchAsyncErrors(async (req, res, next) => {
@@ -196,6 +205,85 @@ exports.update_exam = catchAsyncErrors(async (req, res, next) => {
       success: true,
       message: "Exam updated successfully",
       exam,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+// ***********************all payments records*************************8
+
+
+// all portfolio
+exports.getallportfolio_payment = catchAsyncErrors(async (req, res, next) => {
+  try {
+    let Portfoliopay = await PortfolioPayment.find();
+
+    res.status(200).json({
+      success: true,
+      Portfoliopaylength: Portfoliopay.length,
+      Portfoliopay,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// all essay
+exports.getallessay_payment = catchAsyncErrors(async (req, res, next) => {
+  try {
+    let essaypay = await Essaypayment.find();
+
+    res.status(200).json({
+      success: true,
+      essaypaylength: essaypay.length,
+      essaypay,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// all common app
+exports.getallcssprofile_payment = catchAsyncErrors(async (req, res, next) => {
+  try {
+    let cssprofile = await CssProfilePayment.find();
+
+    res.status(200).json({
+      success: true,
+      cssprofilelength: cssprofile.length,
+      cssprofile,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// all portfolio
+exports.getallcommonapp_payment = catchAsyncErrors(async (req, res, next) => {
+  try {
+    let commonapp = await CommanappPayment.find();
+
+    res.status(200).json({
+      success: true,
+      commonapplength: commonapp.length,
+      commonapp,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// all portfolio
+exports.getallexamprep_payment = catchAsyncErrors(async (req, res, next) => {
+  try {
+    let examprep = await Examprep_payment.find();
+
+    res.status(200).json({
+      success: true,
+      exampreplength: examprep.length,
+      examprep,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

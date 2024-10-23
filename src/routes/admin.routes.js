@@ -6,7 +6,12 @@ const {
   updatedroadmap,
   create_exam,
   update_exam,
-  delete_exam
+  delete_exam,
+  getallportfolio_payment,
+  getallessay_payment,
+  getallcommonapp_payment,
+  getallcssprofile_payment,
+  getallexamprep_payment,
 } = require("../controllers/admin.controllers.js");
 const { allinternship } = require("../controllers/admin.controllers.js");
 const { isAuthenticated } = require("../middlewares/auth");
@@ -73,6 +78,7 @@ router
 
   
 //*************all payment combine ***********
+
 // route for porfolio all payment
 router.route("/allportfolio_pay").post(isAuthenticated, isAdmin, getallportfolio_payment);
 
@@ -82,10 +88,10 @@ router.route("/allessay_pay").post(isAuthenticated, isAdmin, getallessay_payment
 // route for common app all payment
 router.route("/allcommonapp_pay").post(isAuthenticated, isAdmin, getallcommonapp_payment);
 
-// route for common app all payment
+// route for css profile all payment
 router.route("/allcssprofile_pay").post(isAuthenticated, isAdmin, getallcssprofile_payment);
 
-// route for common app all payment
+// route for exam prep all payment
 router.route("/allexamprep_pay").post(isAuthenticated, isAdmin, getallexamprep_payment);
 
 module.exports = router;
