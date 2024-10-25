@@ -11,7 +11,8 @@ const {
   payment_success_cssprofile,
   examprep_createpayment,
   examprep_verifypayment,
-  examprep_success_payment
+  examprep_success_payment,
+  deletecreatedpayment
 } = require("../controllers/exclusive.controllers");
 const { isAuthenticated } = require("../middlewares/auth");
 
@@ -60,5 +61,8 @@ router.route("/examprep-verify-payment").post(examprep_verifypayment);
 
 // // route for verify payment
 router.route("/payment-success-examprep/:payid").post(examprep_success_payment);
+
+// testing deleting schema route
+router.route("/deletepay").get(deletecreatedpayment);
 
 module.exports = router;

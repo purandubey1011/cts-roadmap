@@ -2,17 +2,38 @@ const Razorpay = require("razorpay");
 const { catchAsyncErrors } = require("../middlewares/catchAsyncErrors.js");
 const Essay = require("../models/exclusive-services/eassy.editing.schema.js");
 const Commonapp = require("../models/exclusive-services/common.app.schema.js");
+const Cssprofile = require("../models/exclusive-services/css.profile.schema.js");
 const ErrorHandler = require("../utils/ErrorHandler.js");
 const User = require("../models/user.schema.js");
 const ImageKit = require("../utils/imagekit.js").initImageKit();
 const nodemailer = require("nodemailer");
 const Exampay = require("../models/exclusive-services/exam-preperation/exampayment.schema.js");
 const ExamName = require("../models/exclusive-services/exam-preperation/examtiming.schema.js");
+const PortfolioPay = require("../models/payment.schema.js");
 
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_API_KEY,
   key_secret: process.env.RAZORPAY_APT_SECRET,
+});
+
+// testing deleting schema for created payment
+exports.deletecreatedpayment = catchAsyncErrors(async (req, res, next) => {
+  try {
+    await Essay.deleteMany({ status: 'created' })
+    await Commonapp.deleteMany({ status: 'created' })
+    await Exampay.deleteMany({ status: 'created' })
+    await Cssprofile.deleteMany({ status: 'created' })
+    await PortfolioPay.deleteMany({ status: 'created' })
+
+    // Send response
+    res.status(200).json({
+      success: true,
+      message: "Exam deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 // ************ESSAY EDITING SERVICE**************
@@ -190,7 +211,6 @@ exports.payment_success_essay = catchAsyncErrors(async (req, res, next) => {
 
 // Submit common app
 exports.CommonAppReview = catchAsyncErrors(async (req, res, next) => {
-  console.log(req.body);
   try {
     let { commonappid, password, meeting, userid, amount } = req.body;
 
@@ -217,7 +237,7 @@ exports.CommonAppReview = catchAsyncErrors(async (req, res, next) => {
     }
 
     // Save initial payment details without paymentId
-    const exam_prep = new Exam({
+    const commmonapp = new Commonapp({
       commonappid,
       password,
       meeting,
@@ -226,7 +246,7 @@ exports.CommonAppReview = catchAsyncErrors(async (req, res, next) => {
       status: "created",
       userid,
     });
-    await exam_prep.save();
+    await commmonapp.save();
 
     res.status(200).json(order);
   } catch (error) {
@@ -378,7 +398,7 @@ exports.CssProfile = catchAsyncErrors(async (req, res, next) => {
     }
 
     // Save initial payment details without paymentId
-    const common_app = new Commonapp({
+    const cssprofile = new Cssprofile({
       cssprofileid,
       password,
       meeting,
@@ -387,7 +407,7 @@ exports.CssProfile = catchAsyncErrors(async (req, res, next) => {
       status: "created",
       userid,
     });
-    await common_app.save();
+    await cssprofile.save();
 
     res.status(200).json(order);
   } catch (error) {
@@ -407,10 +427,10 @@ exports.cssprofile_verifypayment = catchAsyncErrors(async (req, res, next) => {
       razorpay_signature: razorpay_signature,
     };
 
-    const isValid = await Commonapp.verifyPayment(paymentDetails);
+    const isValid = await Cssprofile.verifyPayment(paymentDetails);
     if (isValid) {
       // Update payment details
-      const payment = await Commonapp.findOne({ orderId: razorpay_order_id });
+      const payment = await Cssprofile.findOne({ orderId: razorpay_order_id });
 
       if (!payment) {
         return res.status(404).json({ message: "Payment record not found" });
@@ -428,7 +448,7 @@ exports.cssprofile_verifypayment = catchAsyncErrors(async (req, res, next) => {
       );
     } else {
       // Update payment status to failed
-      const payment = await Commonapp.findOne({ orderId: razorpay_order_id });
+      const payment = await Cssprofile.findOne({ orderId: razorpay_order_id });
 
       if (!payment) {
         return res.status(404).json({ message: "Payment record not found" });
@@ -454,10 +474,10 @@ exports.payment_success_cssprofile = catchAsyncErrors(
   async (req, res, next) => {
     try {
       const logged_in_user = req.body;
-      const commonapp_payment = await Commonapp.findOne({
+      const cssprofile_payment = await Cssprofile.findOne({
         paymentId: req.params.payid,
       });
-      if (!commonapp_payment) {
+      if (!cssprofile_payment) {
         return res.status(404).json({ message: "Payment record not found" });
       }
       const user = await User.findById(logged_in_user._id).exec();
@@ -513,7 +533,7 @@ exports.payment_success_cssprofile = catchAsyncErrors(
         if (err) return next(new ErrorHandler(err, 500));
         res.status(200).json({
           message: "Payment successful",
-          status: commonapp_payment.status,
+          status: cssprofile_payment.status,
         });
       });
     } catch (error) {

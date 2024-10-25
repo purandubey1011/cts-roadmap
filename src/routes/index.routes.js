@@ -72,4 +72,6 @@ router.route("/allportfolio").post(showportfolio);
 // get all exams
 router.route("/exam-prep/exams").get(allexams);
 
+
+
 module.exports = router;
